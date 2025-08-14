@@ -13,6 +13,9 @@ import {
   RotateCcw,
   Sparkles,
   Gift,
+  Check,
+  X,
+  Loader,
 } from "lucide-react";
 
 const CreativeCorner = () => {
@@ -20,6 +23,12 @@ const CreativeCorner = () => {
   const [answer, setAnswer] = useState("");
   const [showError, setShowError] = useState(false);
   const [currentSection, setCurrentSection] = useState("main");
+  
+  // Answer checking animation states
+  const [isChecking, setIsChecking] = useState(false);
+  const [showResult, setShowResult] = useState(false);
+  const [isCorrect, setIsCorrect] = useState(false);
+  const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
 
   // Message Animation States
   const [isWriting, setIsWriting] = useState(false);
@@ -140,16 +149,35 @@ Your Brother Ujjwal❤️`;
     }
   }, [isWriting]);
 
-  const handleSubmit = () => {
-    if (
-      answer.toLowerCase().includes("shinta") &&
-      answer.toLowerCase().includes("ma'am")
-    ) {
+  const handleSubmit = async () => {
+    if (isChecking) return; // Prevent multiple submissions
+    
+    setIsChecking(true);
+    setShowError(false);
+    setShowResult(false);
+    
+    // Simulate checking animation for 2 seconds
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    const isAnswerCorrect = answer.toLowerCase().includes("shinta") && 
+                           answer.toLowerCase().includes("ma'am");
+    
+    setIsCorrect(isAnswerCorrect);
+    setShowResult(true);
+    setIsChecking(false);
+    
+    if (isAnswerCorrect) {
+      // Show success animation before unlocking
+      setShowSuccessAnimation(true);
+      await new Promise(resolve => setTimeout(resolve, 2000));
       setIsUnlocked(true);
-      setShowError(false);
     } else {
+      // Show error for 3 seconds then reset
       setShowError(true);
-      setTimeout(() => setShowError(false), 3000);
+      setTimeout(() => {
+        setShowError(false);
+        setShowResult(false);
+      }, 3000);
     }
   };
 
@@ -224,39 +252,173 @@ Your Brother Ujjwal❤️`;
 
   if (!isUnlocked) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+      <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 relative overflow-hidden">
+        {/* Background particles for success animation */}
+        {showSuccessAnimation && (
+          <div className="absolute inset-0 pointer-events-none">
+            {[...Array(20)].map((_, i) => (
+              <div
+                key={i}
+                className="absolute animate-float"
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                  animationDelay: `${Math.random() * 2}s`,
+                  animationDuration: `${3 + Math.random() * 2}s`
+                }}
+              >
+                <div className="text-2xl">
+                  {['🎉', '✨', '💝', '🌟', '💖'][Math.floor(Math.random() * 5)]}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        
         <div className="max-w-md mx-auto">
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20 text-center">
-            <Lock className="w-16 h-16 mx-auto mb-6 text-yellow-400" />
+          <div className={`bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20 text-center transition-all duration-500 ${showSuccessAnimation ? 'scale-110 bg-green-500/20' : ''}`}>
+            <div className="relative">
+              <Lock className="w-16 h-16 mx-auto mb-6 text-yellow-400" />
+              {showSuccessAnimation && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-16 h-16 rounded-full bg-green-500 flex items-center justify-center animate-ping">
+                    <Check className="w-8 h-8 text-white" />
+                  </div>
+                </div>
+              )}
+            </div>
+            
             <h2 className="text-2xl font-bold text-white mb-4">
-              Protected Section
+              {showSuccessAnimation ? "Welcome, Mridula! 🎉" : "Protected Section"}
             </h2>
+            
             <p className="text-white/80 mb-6">
-              This special creative corner is just for you! Answer this question
-              to unlock:
+              {showSuccessAnimation 
+                ? "Unlocking your creative corner..." 
+                : "This special creative corner is just for you! Answer this question to unlock:"
+              }
             </p>
-            <p className="text-lg text-white mb-4 font-medium">
-              What was the name of the class teacher of 8th class?
-            </p>
-            <input
-              type="text"
-              value={answer}
-              onChange={(e) => setAnswer(e.target.value)}
-              className="w-full p-3 rounded-lg bg-white/20 border border-white/30 text-white placeholder-white/50 mb-4"
-              placeholder="Enter the answer..."
-            />
-            {showError && (
-              <p className="text-red-400 mb-4">Incorrect answer! Try again.</p>
+            
+            {!showSuccessAnimation && (
+              <>
+                <p className="text-lg text-white mb-4 font-medium">
+                  What was the name of the class teacher of 8th class?
+                </p>
+                <input
+                  type="text"
+                  value={answer}
+                  onChange={(e) => setAnswer(e.target.value)}
+                  disabled={isChecking || showResult}
+                  className="w-full p-3 rounded-lg bg-white/20 border border-white/30 text-white placeholder-white/50 mb-4 disabled:opacity-50"
+                  placeholder="Enter the answer..."
+                />
+                
+                {/* Checking Animation */}
+                {isChecking && (
+                  <div className="mb-4">
+                    <div className="flex items-center justify-center space-x-2 text-blue-400">
+                      <Loader className="w-5 h-5 animate-spin" />
+                      <span className="animate-pulse">Checking your answer...</span>
+                    </div>
+                    <div className="mt-2 w-full bg-white/20 rounded-full h-2">
+                      <div className="bg-blue-400 h-2 rounded-full animate-progress"></div>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Result Animation */}
+                {showResult && !isChecking && (
+                  <div className={`mb-4 p-4 rounded-lg animate-fadeIn ${
+                    isCorrect 
+                      ? 'bg-green-500/20 border border-green-400/50' 
+                      : 'bg-red-500/20 border border-red-400/50'
+                  }`}>
+                    <div className="flex items-center justify-center space-x-2">
+                      {isCorrect ? (
+                        <>
+                          <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center animate-bounce">
+                            <Check className="w-5 h-5 text-white" />
+                          </div>
+                          <span className="text-green-400 font-bold">Perfect! Welcome home! ✨</span>
+                        </>
+                      ) : (
+                        <>
+                          <div className="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center animate-shake">
+                            <X className="w-5 h-5 text-white" />
+                          </div>
+                          <span className="text-red-400 font-bold">Oops! Try again 💝</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                )}
+                
+                <button
+                  onClick={handleSubmit}
+                  disabled={isChecking || !answer.trim()}
+                  className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 flex items-center justify-center"
+                >
+                  {isChecking ? (
+                    <>
+                      <Loader className="w-5 h-5 mr-2 animate-spin" />
+                      Checking...
+                    </>
+                  ) : (
+                    <>
+                      <Unlock className="w-5 h-5 mr-2" />
+                      Unlock Creative Corner
+                    </>
+                  )}
+                </button>
+              </>
             )}
-            <button
-              onClick={handleSubmit}
-              className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 flex items-center justify-center"
-            >
-              <Unlock className="w-5 h-5 mr-2" />
-              Unlock Creative Corner
-            </button>
           </div>
         </div>
+        
+        <style jsx>{`
+          @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+          }
+          
+          @keyframes progress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+          }
+          
+          @keyframes fadeIn {
+            0% { 
+              opacity: 0; 
+              transform: scale(0.8) translateY(10px); 
+            }
+            100% { 
+              opacity: 1; 
+              transform: scale(1) translateY(0); 
+            }
+          }
+          
+          @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+          }
+          
+          .animate-float {
+            animation: float 3s ease-in-out infinite;
+          }
+          
+          .animate-progress {
+            animation: progress 2s ease-in-out;
+          }
+          
+          .animate-fadeIn {
+            animation: fadeIn 0.5s ease-out;
+          }
+          
+          .animate-shake {
+            animation: shake 0.5s ease-in-out;
+          }
+        `}</style>
       </div>
     );
   }
