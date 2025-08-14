@@ -8,6 +8,7 @@ const Navigation = ({ currentPage, setCurrentPage }) => {
   const navItems = [
     { id: 'home', label: 'Home', icon: Home },
     { id: 'messages', label: 'Messages', icon: MessageCircle },
+    { id: 'sister-chat', label: 'Sister Chat', icon: MessageCircle },
     { id: 'festival', label: 'Festival', icon: Calendar },
     { id: 'creative', label: 'Creative Corner', icon: Lightbulb },
     { id: 'wishes', label: 'Wishes', icon: Star }

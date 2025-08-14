@@ -3,6 +3,7 @@ import { Heart } from 'lucide-react';
 import Navigation from './components/Navigation';
 import LandingPage from './components/LandingPage';
 import MessagesPage from './components/MessagePage';
+import SisterChat from './components/SisterChat';
 import FestivalPage from './components/FestivalPage';
 import CreativeCorner from './components/CreativeCorner';
 import WishesGallery from './components/WishesGallery';
@@ -16,6 +17,8 @@ const App = () => {
         return <LandingPage />;
       case 'messages':
         return <MessagesPage />;
+      case 'sister-chat':
+        return <SisterChat />;
       case 'festival':
         return <FestivalPage />;
       case 'creative':
