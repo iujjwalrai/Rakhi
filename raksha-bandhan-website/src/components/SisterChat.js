@@ -11,7 +11,8 @@ const SisterChat = () => {
   const [initialLoading, setInitialLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
-  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+  const API_BASE_URL_temp = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+  const API_BASE_URL = `${API_BASE_URL_temp}/api`;
 
   // Emoji list
   const emojis = ['❤️', '😊', '😍', '🥰', '😘', '🤗', '💕', '💖', '💝', '🎉', '✨', '🌟', '💫', '🌸', '🌺', '🌷', '🌹', '🌻', '🌼', '🍀', '🎀', '🎁', '💝', '💌', '📝', '💭', '💬', '💋', '👄', '👅', '👁️', '👀', '👂', '👃', '👣', '💪', '👍', '👎', '👌', '✌️', '🤞', '🤟', '🤘', '🤙', '👈', '👉', '👆', '🖕', '👇', '☝️', '👋', '🤚', '🖐️', '✋', '🖖', '👌', '🤌', '🤏'];
